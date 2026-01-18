@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "HW-145",
+			"path": "../../qnxprojects/HW-145"
+		},
+		{
+			"name": "hid-input-demo",
+			"path": "../hid-input-demo"
+		}
+	],
+	"settings": {}
+}
