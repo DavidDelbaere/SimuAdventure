@@ -10,13 +10,10 @@ def fetch():
     try:
         # 1. Send to Pi
         sock.sendto("Data".encode(), (UDP_IP, UDP_PORT))
-        print(f"Sent to Pi")
 
         # 2. Wait for Pi to write back
         data, addr = sock.recvfrom(1024)
-        print(f"Pi replied: {data.decode()}")
         return data.decode()
         
     except socket.timeout:
         print("Error: Pi did not respond in time.")
-fetch()
