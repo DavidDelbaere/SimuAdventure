@@ -1,5 +1,7 @@
 def geminiPrompt(geminiNeededResponse):
     
+    input()
+
     match geminiNeededResponse:
         case 1:
             return "I have moved."
