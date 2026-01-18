@@ -22,9 +22,45 @@ async function playChunks(chunks, delay = 5000) {
     }
 }
 
+async function submitText(text) {
+    text = (text || "").trim();
+    if (!text) return;
+
+    let ended = false;
+
+    inputBox.value = "";
+    inputBox.disabled = true;
+    enterButton.disabled = true;
+
+    try {
+        const response = await fetch("/input", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+        await playChunks(data.chunks);
+
+        ended = !!data.is_over;
+        if (ended) writeToOutput("— The End —");
+
+    } catch (err) {
+        console.error(err);
+        writeToOutput("⚠️ Something went wrong sending your input.");
+    } finally {
+        if (!ended) {
+            inputBox.disabled = false;
+            enterButton.disabled = false;
+            inputBox.focus();
+        }
+    }
+}
+
 // Submit user input (turn)
 async function submitInput() {
-    const text = inputBox.value.trim();
+    await submitText(inputBox.value);
+    /*const text = inputBox.value.trim();
     if (!text) return;
 
     let ended = false;
@@ -65,6 +101,28 @@ async function submitInput() {
             inputBox.disabled = true;
             enterButton.disabled = true;
         }
+    }*/
+}
+
+async function listenForPiButtons() {
+    while (true) {
+        try {
+            const res = await fetch("/pi_action", { cache: "no-store" });
+
+            if (res.status === 204) {
+                // Nothing expected yet, wait a bit and retry
+                await new Promise(r => setTimeout(r, 500));
+                continue;
+            }
+
+            const data = await res.json();
+            if (data.text) {
+                await submitText(data.text);   // <-- SAME path as Enter key
+            }
+        } catch (e) {
+            console.error("Pi poll error:", e);
+            await new Promise(r => setTimeout(r, 1000));
+        }
     }
 }
 
@@ -89,14 +147,16 @@ async function startGame() {
 
         await playChunks(data.chunks);
 
-    } catch (err) {
-        console.error(err);
-        writeToOutput("⚠️ Failed to start the game.");
-    } finally {
         inputBox.disabled = false;
         enterButton.disabled = false;
         inputBox.focus();
-    }
+
+        listenForPiButtons();  // Start polling for Pi button inputs
+
+    } catch (err) {
+        console.error(err);
+        writeToOutput("⚠️ Failed to start the game.");
+    } 
 }
 
 startGame();

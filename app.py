@@ -5,6 +5,7 @@ from webAdventureMain import (
     generate_conclusion_chunks,
 )
 import secrets
+from geminiPrompt import geminiPrompt
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -16,13 +17,24 @@ def index():
 @app.route("/start")
 def start():
     try:
-        chunks, full_story = generate_intro_story_chunks()
+        chunks, full_story, needed_type = generate_intro_story_chunks()
         session["story"] = full_story
         session["turn"] = 1
+        session["needed_type"] = needed_type  # Initialize needed_type in session
         return jsonify({"chunks": chunks, "is_over": False})
     except Exception as e:
         print("Error in /start:", e)
         return jsonify({"chunks": ["⚠️ Failed to start the game."], "is_over": True}), 500
+
+@app.route("/pi_action", methods=["GET"])
+def pi_action():
+    needed_type = session.get("needed_type")
+    if needed_type is None:
+        return jsonify({"text": None}), 204  # nothing to wait for yet
+
+    # Blocks until the correct physical button is pressed:
+    text = geminiPrompt(int(needed_type))
+    return jsonify({"text": text})
 
 @app.route("/input", methods=["POST"])
 def handle_input():
@@ -45,11 +57,13 @@ def handle_input():
             chunks, new_text = generate_conclusion_chunks(story_so_far)
             session["story"] = (story_so_far + " " + new_text).strip()
             session["turn"] = 5
+            session.pop("needed_type", None)  # Clear needed_type as story is over
             return jsonify({"chunks": chunks, "is_over": True})
 
-        chunks, new_text = generate_next_story_chunks(story_so_far, user_input, turn)
+        chunks, new_text, needed_type = generate_next_story_chunks(story_so_far, user_input, turn)
         session["story"] = (story_so_far + " " + new_text).strip()
         session["turn"] = next_block_number
+        session["needed_type"] = needed_type
 
         return jsonify({"chunks": chunks, "is_over": False})
 

@@ -51,13 +51,14 @@ def generate_intro_story_chunks():
 
     parsed = json.loads(response.text)
     story = parsed["story"].strip()
+    needed_type = parsed["type"]
 
     chunks = _split_into_chunks(story)
 
     # Optional: advance your key counter if that's your intent
     # _bump_key_index(n)
 
-    return chunks, story
+    return chunks, story, needed_type
 
 def generate_next_story_chunks(story_so_far, user_input, turn):
     n = _get_key_index()
@@ -84,11 +85,12 @@ def generate_next_story_chunks(story_so_far, user_input, turn):
 
     parsed = json.loads(response.text)
     new_story = parsed["story"].strip()
+    needed_type = parsed["type"]
 
     full_story = (story_so_far + " " + new_story).strip()
     chunks = _split_into_chunks(new_story)
 
-    return chunks, full_story
+    return chunks, full_story, needed_type
 
 def generate_conclusion_chunks(story_so_far):
     n = _get_key_index()
