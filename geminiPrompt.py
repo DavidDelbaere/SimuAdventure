@@ -1,19 +1,29 @@
+import time
+from dine import fetch
+
 def geminiPrompt(geminiNeededResponse):
-    
-    input()
 
     match geminiNeededResponse:
         case 1:
-            return "I have moved."
+            #button button
+            while(fetch[0] != 1):
+                time.sleep(0.5)
+                return(geminiNeededResponse)
+            return "I have pressed the button."
         
         case 2:
-            return "I have heated up the requested thing."
+            #lights button
+            while(fetch[1] != 1):
+                time.sleep(0.5)
+                return(geminiNeededResponse)
+            return "I have turned the lights on."
         
         case 3:
-            return "I have cooled down the requested thing."
-        
-        case 4:
-            return "I have pushed the requested button."
+            #heat button
+            while(fetch[2] != 1):
+                time.sleep(0.5)
+                return(geminiNeededResponse)
+            return "I have heated the object up."
         
         #default case
         case _:
