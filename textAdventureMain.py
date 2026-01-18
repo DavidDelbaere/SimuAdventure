@@ -21,8 +21,8 @@ geminiResponse = client.models.generate_content_stream(
     model="gemini-2.5-flash", 
     contents="I want to participate in a text-based adventure story. Do not be too dramatic with the story; make it realistic. " \
     "Generate an introduction to my story. Do not include any preambulatory text; I want your response to begin with the story. " \
-    "Based on how the story begins, ask me to (1) move, (2) heat something up, (3) cool something down, or (4) press a button. " \
-    "Be clear which of these 4 things you are asking me to do, but do not explicitly say it. "
+    "Based on how the story begins, ask me to (1) press a button, (2) turn the lights on, or (3) heat something up. " \
+    "Be clear which of these 3 things you are asking me to do, but do not explicitly say it. "
     "Your story will be a total of 5 text blocks long, with a response from me between each. Plan an ending accordingly.",
     config={
         "response_mime_type": "application/json",
@@ -93,8 +93,8 @@ while (i < 4):
 
     promptContent = geminiPrompt(json.loads(full_text)['type']) + " Generate the next part of the story based on this," \
     "ensuring that there is variation between each of the text blocks you generate and that the story will be a total of " \
-    "5 text blocks long. Again, ask me to (1) move, (2) heat something up, (3) cool something down, or (4) press a button." \
-    "Be clear which of these 4 things you are asking me to do, but do not explicitly say it." \
+    "5 text blocks long. Again, ask me to (1) press a button, (2) turn the lights on, or (3) heat something up." \
+    "Be clear which of these 3 things you are asking me to do, but do not explicitly say it." \
     "As a reminder, the story so far is: " + currentStory
 
     geminiResponse = client.models.generate_content_stream(
